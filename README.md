@@ -71,6 +71,10 @@
 
 - Borrowing Books
 
+# Database
+
+[Database](db.jpeg)
+
 # REST API endpoints
 ### REST API Endpoints
 
