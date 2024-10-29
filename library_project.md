@@ -68,7 +68,7 @@
 | `/api/books/{bookId}`              | PUT                | Update an existing book details           | `bookId`                                                  |
 | `/api/authors/{authorId}`          | PUT                | Update author information                 | `authorId`                                                |
 | `/api/categories/{categoryId}`     | PUT                | Update category details                   | `categoryId`                                              |
-| `/api/library/books/{bookId}`      | PUT                | Change the status of a book               | `userId`, `bookId`, `status` (request parameter)          |
+| `/api/library/books/{bookId}`      | PUT                | Change the status of a book               | `bookId`, `status` (request parameter)                    |
 | `/api/books/{bookId}`              | DELETE             | Delete a book from the library            | `bookId`                                                  |
 | `/api/authors/{authorId}`          | DELETE             | Delete an author                          | `authorId`                                                |
 | `/api/categories/{categoryId}`     | DELETE             | Delete a category                         | `categoryId`                                              |
