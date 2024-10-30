@@ -17,6 +17,8 @@ databaseChangeLog:
                   type: varchar(30)
                   constraints:
                     nullable: false
+                    unique: true
+                    uniqueConstraintName: categories_name_uq
               - column:
                   name: description
                   type: text
