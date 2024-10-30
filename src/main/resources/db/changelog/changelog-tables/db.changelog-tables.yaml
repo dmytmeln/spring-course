@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changelog-tables/changeset/2024_10_29_create_authors.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/2024_10_29_create_categories.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/2024_10_29_create_books.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/2024_10_29_create_book_authors.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/2024_10_30_create_users.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/2024_10_30_create_libraries.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/2024_10_30_create_book_libraries.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/2024_10_30_create_reviews.yaml

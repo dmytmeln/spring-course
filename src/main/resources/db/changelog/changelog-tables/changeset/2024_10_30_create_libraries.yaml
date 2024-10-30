@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_libraries
+      author: Dmytro Melnyk
+      changes:
+        - createTable:
+            tableName: libraries
+            columns:
+              - column:
+                  name: library_id
+                  type: serial
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: libraries_pk
+                    foreignKeyName: libraries_users_fk
+                    referencedTableName: users
+                    referencedColumnNames: user_id

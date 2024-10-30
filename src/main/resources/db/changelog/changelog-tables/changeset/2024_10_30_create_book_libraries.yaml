@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_book_libraries
+      author: Dmytro Melnyk
+      changes:
+        - createTable:
+            tableName: book_libraries
+            columns:
+              - column:
+                  name: library_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    foreignKeyName: book_libraries_libraries_fk
+                    referencedTableName: libraries
+                    referencedColumnNames: library_id
+              - column:
+                  name: book_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    foreignKeyName: book_libraries_books_fk
+                    referencedTableName: books
+                    referencedColumnNames: book_id
+              - column:
+                  name: status
+                  type: varchar(50)
+                  constraints:
+                    nullable: true
+        - addPrimaryKey:
+            tableName: book_libraries
+            columnNames: library_id, book_id
+            constraintName: book_libraries_pk
