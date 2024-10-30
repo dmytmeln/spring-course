@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_users
+      author: Dmytro Melnyk
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: user_id
+                  type: serial
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: users_pk
+              - column:
+                  name: email
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: users_email_uq
+              - column:
+                  name: firstname
+                  type: varchar(32)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: lastname
+                  type: varchar(32)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: password
+                  type: varchar(150)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role
+                  type: varchar(30)
+                  constraints:
+                    nullable: false

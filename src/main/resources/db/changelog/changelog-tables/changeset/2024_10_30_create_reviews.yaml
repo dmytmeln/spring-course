@@ -1,0 +1,49 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_reviews
+      author: Dmytro Melnyk
+      changes:
+        - createTable:
+            tableName: reviews
+            columns:
+              - column:
+                  name: review_id
+                  type: serial
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: reviews_pk
+              - column:
+                  name: user_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    foreignKeyName: reviews_users_fk
+                    referencedTableName: users
+                    referencedColumnNames: user_id
+              - column:
+                  name: book_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    foreignKeyName: reviews_books_fk
+                    referencedTableName: books
+                    referencedColumnNames: book_id
+              - column:
+                  name: rating
+                  type: tinyint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: comment
+                  type: text
+                  constraints:
+                    nullable: true
+        - addUniqueConstraint:
+            tableName: reviews
+            columnNames: user_id, book_id
+            constraintName: reviews_user_id_book_id_uq

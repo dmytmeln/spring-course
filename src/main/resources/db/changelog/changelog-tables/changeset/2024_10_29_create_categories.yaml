@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_categories
+      author: Dmytro Melnyk
+      changes:
+        - createTable:
+            tableName: categories
+            columns:
+              - column:
+                  name: category_id
+                  type: serial
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: categories_pk
+              - column:
+                  name: name
+                  type: varchar(30)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: text
+                  constraints:
+                    nullable: true
