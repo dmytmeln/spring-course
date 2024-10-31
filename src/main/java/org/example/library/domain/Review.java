@@ -20,7 +20,7 @@ public class Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "book_id", unique = true, nullable = false)
+    @Column(name = "review_id", unique = true, nullable = false)
     private Integer id;
 
     @Column(name = "rating", nullable = false)
