@@ -48,8 +48,4 @@ public class Book {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @OneToMany
-    @JoinColumn(name = "book_id")
-    private List<Review> reviews;
-
 }
