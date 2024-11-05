@@ -26,12 +26,7 @@ public class Library {
     @JoinColumn(name = "library_id", nullable = false)
     private User user;
 
-    @ManyToMany
-    @JoinTable(
-            name = "book_libraries",
-            joinColumns = {@JoinColumn(name = "library_id")},
-            inverseJoinColumns = {@JoinColumn(name = "book_id")}
-    )
-    private List<Book> books;
+    @OneToMany(mappedBy = "library")
+    private List<LibraryBook> books;
 
 }
