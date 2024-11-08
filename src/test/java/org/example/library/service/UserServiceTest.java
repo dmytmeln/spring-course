@@ -1,10 +1,11 @@
 package org.example.library.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.example.library.domain.User;
 import org.example.library.dto.user.CreateUser;
 import org.example.library.dto.user.UpdateUser;
 import org.example.library.dto.user.UserResponse;
+import org.example.library.exception.BadRequestException;
+import org.example.library.exception.NotFoundException;
 import org.example.library.mapper.UserMapper;
 import org.example.library.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +30,8 @@ public class UserServiceTest {
     private UserRepository repository;
     @Mock
     private UserMapper mapper;
+    @Mock
+    private PasswordEncoder passwordEncoder;
     @InjectMocks
     private UserService service;
 
@@ -69,11 +73,11 @@ public class UserServiceTest {
     }
 
     @Test
-    public void givenNotExistingId_whenGetUser_thenThrowEntityNotFoundException() {
+    public void givenNotExistingId_whenGetUser_thenThrowNotFoundException() {
         when(repository.findById(DEFAULT_ID)).thenReturn(Optional.empty());
 
         assertThrows(
-                EntityNotFoundException.class,
+                NotFoundException.class,
                 () -> service.getExistingUser(DEFAULT_ID)
         );
     }
@@ -96,11 +100,11 @@ public class UserServiceTest {
     }
 
     @Test
-    public void givenNotExistingId_whenGetUserResponse_thenThrowEntityNotFoundException() {
+    public void givenNotExistingId_whenGetUserResponse_thenThrowNotFoundException() {
         when(repository.findById(DEFAULT_ID)).thenReturn(Optional.empty());
 
         assertThrows(
-                EntityNotFoundException.class,
+                NotFoundException.class,
                 () -> service.getExistingUserResponse(DEFAULT_ID)
         );
     }
@@ -175,14 +179,15 @@ public class UserServiceTest {
     }
 
     @Test
-    public void givenExistingIdAndMismatchedCurrentPassword_whenUpdateUserPassword_thenThrowIllegalArgumentException() {
+    public void givenExistingIdAndMismatchedCurrentPassword_whenUpdateUserPassword_thenThrowBadRequestException() {
         var request = newDefaultUpdateUserPassword();
         request.setCurrentPassword(DEFAULT_NEW_PASSWORD);
         var existingUser = newDefaultUser();
         when(repository.findById(DEFAULT_ID)).thenReturn(Optional.of(existingUser));
+        when(passwordEncoder.matches(request.getCurrentPassword(), existingUser.getPassword())).thenReturn(false);
 
         assertThrows(
-                IllegalArgumentException.class,
+                BadRequestException.class,
                 () -> service.updateUserPassword(DEFAULT_ID, request)
         );
     }
@@ -199,10 +204,9 @@ public class UserServiceTest {
     }
 
     private UserResponse setupMockedUpdateUserPasswordFlow(User existingUser) {
-
         var updatedResponse = newDefaultUserResponse();
-
         when(repository.findById(DEFAULT_ID)).thenReturn(Optional.of(existingUser));
+        when(passwordEncoder.matches(DEFAULT_PASSWORD, existingUser.getPassword())).thenReturn(true);
         when(repository.save(existingUser)).thenReturn(existingUser);
         when(mapper.toResponse(existingUser)).thenReturn(updatedResponse);
         return updatedResponse;

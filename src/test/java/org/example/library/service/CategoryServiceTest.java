@@ -1,7 +1,7 @@
 package org.example.library.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.example.library.dto.CategoryDto;
+import org.example.library.exception.NotFoundException;
 import org.example.library.mapper.CategoryMapper;
 import org.example.library.repository.CategoryRepository;
 import org.junit.jupiter.api.Test;
@@ -65,11 +65,11 @@ public class CategoryServiceTest {
     }
 
     @Test
-    public void givenNotExistingId_whenGetCategory_thenThrowEntityNotFoundException() {
+    public void givenNotExistingId_whenGetCategory_thenThrowNotFoundException() {
         when(repository.findById(DEFAULT_ID)).thenReturn(Optional.empty());
 
         assertThrows(
-                EntityNotFoundException.class,
+                NotFoundException.class,
                 () -> service.getExistingCategory(DEFAULT_ID));
     }
 
@@ -91,11 +91,11 @@ public class CategoryServiceTest {
     }
 
     @Test
-    public void givenNotExistingId_whenGetCategoryDto_thenThrowEntityNotFoundException() {
+    public void givenNotExistingId_whenGetCategoryDto_thenThrowNotFoundException() {
         when(repository.findById(DEFAULT_ID)).thenReturn(Optional.empty());
 
         assertThrows(
-                EntityNotFoundException.class,
+                NotFoundException.class,
                 () -> service.getExistingCategoryDto(DEFAULT_ID));
     }
 
@@ -176,11 +176,11 @@ public class CategoryServiceTest {
     }
 
     @Test
-    public void givenNonExistingId_whenUpdateCategory_thenThrowEntityNotFoundException() {
+    public void givenNonExistingId_whenUpdateCategory_thenThrowNotFoundException() {
         when(repository.findById(DEFAULT_ID)).thenReturn(Optional.empty());
 
         assertThrows(
-                EntityNotFoundException.class,
+                NotFoundException.class,
                 () -> service.updateCategory(DEFAULT_ID, newDefaultCategoryDtoWithoutId()));
     }
 

@@ -1,14 +1,16 @@
 package org.example.library.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.example.library.domain.User;
 import org.example.library.dto.user.CreateUser;
-import org.example.library.dto.user.UpdateUserPassword;
 import org.example.library.dto.user.UpdateUser;
+import org.example.library.dto.user.UpdateUserPassword;
 import org.example.library.dto.user.UserResponse;
+import org.example.library.exception.BadRequestException;
+import org.example.library.exception.NotFoundException;
 import org.example.library.mapper.UserMapper;
 import org.example.library.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +21,7 @@ public class UserService {
 
     private final UserRepository repository;
     private final UserMapper mapper;
+    private final PasswordEncoder passwordEncoder;
 
     public List<UserResponse> getAllUsers() {
         return mapper.toResponse(repository.findAll());
@@ -26,7 +29,7 @@ public class UserService {
 
     public User getExistingUser(Integer id) {
         return repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Користувача не знайдено!"));
+                .orElseThrow(() -> new NotFoundException("Користувача не знайдено!"));
     }
 
     public UserResponse getExistingUserResponse(Integer id) {
@@ -35,7 +38,9 @@ public class UserService {
 
     public UserResponse createUser(CreateUser dto) {
         requireNotExistsByEmail(dto.getEmail());
-        var savedUser = repository.save(mapper.toEntity(dto));
+        var user = mapper.toEntity(dto);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        var savedUser = repository.save(user);
         return mapper.toResponse(savedUser);
     }
 
@@ -66,15 +71,15 @@ public class UserService {
 
     public UserResponse updateUserPassword(Integer id, UpdateUserPassword dto) {
         var existingUser = requirePasswordsMatches(id, dto.getCurrentPassword());
-        existingUser.setPassword(dto.getNewPassword());
+        existingUser.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         repository.save(existingUser);
         return mapper.toResponse(existingUser);
     }
 
     private User requirePasswordsMatches(Integer id, String verificationPassword) {
         var existingUser = getExistingUser(id);
-        if (!existingUser.getPassword().equals(verificationPassword)) {
-            throw new IllegalArgumentException("Паролі не збігаються!");
+        if (!passwordEncoder.matches(verificationPassword, existingUser.getPassword())) {
+            throw new BadRequestException("Паролі не збігаються!");
         }
         return existingUser;
     }

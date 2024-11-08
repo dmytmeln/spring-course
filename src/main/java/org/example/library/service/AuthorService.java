@@ -1,9 +1,9 @@
 package org.example.library.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.example.library.domain.Author;
 import org.example.library.dto.AuthorDto;
+import org.example.library.exception.NotFoundException;
 import org.example.library.mapper.AuthorMapper;
 import org.example.library.repository.AuthorRepository;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class AuthorService {
 
     public Author getExistingAuthor(Integer id) {
         return repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Автора не знайдено!"));
+                .orElseThrow(() -> new NotFoundException("Автора не знайдено!"));
     }
 
     public AuthorDto getExistingAuthorDto(Integer id) {
@@ -43,7 +43,7 @@ public class AuthorService {
 
     private void requireExistsById(Integer id) {
         if (!repository.existsById(id)) {
-            throw new EntityNotFoundException("Автора не знайдено!");
+            throw new NotFoundException("Автора не знайдено!");
         }
     }
 

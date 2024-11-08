@@ -3,6 +3,7 @@ package org.example.library.service;
 import jakarta.persistence.EntityNotFoundException;
 import org.example.library.dto.BookRequest;
 import org.example.library.dto.BookResponse;
+import org.example.library.exception.NotFoundException;
 import org.example.library.factory.AuthorFactory;
 import org.example.library.factory.CategoryFactory;
 import org.example.library.mapper.BookMapper;
@@ -18,7 +19,6 @@ import java.util.Optional;
 
 import static org.example.library.factory.AuthorFactory.newDefaultAuthor;
 import static org.example.library.factory.BookFactory.*;
-import static org.example.library.factory.BookFactory.newDefaultBookWithoutId;
 import static org.example.library.factory.CategoryFactory.newDefaultCategory;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -109,11 +109,11 @@ public class BookServiceTest {
     }
 
     @Test
-    public void givenNotExistingId_whenGetBook_thenThrowEntityNotFoundException() {
+    public void givenNotExistingId_whenGetBook_thenThrowNotFoundException() {
         when(repository.findById(DEFAULT_ID)).thenReturn(Optional.empty());
 
         assertThrows(
-                EntityNotFoundException.class,
+                NotFoundException.class,
                 () -> service.getExistingBook(DEFAULT_ID)
         );
     }
@@ -136,11 +136,11 @@ public class BookServiceTest {
     }
 
     @Test
-    public void givenNotExistingId_whenGetBookDto_thenThrowEntityNotFoundException() {
+    public void givenNotExistingId_whenGetBookDto_thenThrowNotFoundException() {
         when(repository.findById(DEFAULT_ID)).thenReturn(Optional.empty());
 
         assertThrows(
-                EntityNotFoundException.class,
+                NotFoundException.class,
                 () -> service.getExistingBookDto(DEFAULT_ID)
         );
     }
@@ -215,12 +215,12 @@ public class BookServiceTest {
     }
 
     @Test
-    public void givenNonExistingId_whenUpdateBook_thenThrowIllegalArgumentException() {
+    public void givenNonExistingId_whenUpdateBook_thenThrowNotFoundExceptionException() {
         var inputRequest = newDefaultBookRequest();
         when(repository.existsById(DEFAULT_ID)).thenReturn(false);
 
         assertThrows(
-                IllegalArgumentException.class,
+                NotFoundException.class,
                 () -> service.updateBook(DEFAULT_ID, inputRequest)
         );
     }
