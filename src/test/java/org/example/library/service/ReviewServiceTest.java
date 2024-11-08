@@ -1,8 +1,9 @@
 package org.example.library.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.example.library.domain.Review;
 import org.example.library.dto.ReviewDto;
+import org.example.library.exception.BadRequestException;
+import org.example.library.exception.NotFoundException;
 import org.example.library.factory.BookFactory;
 import org.example.library.factory.UserFactory;
 import org.example.library.mapper.ReviewMapper;
@@ -92,7 +93,7 @@ public class ReviewServiceTest {
         var inputDto = newDefaultReviewDtoWithoutId();
         var expectedDto = setupMockedUpdateReviewFlow(inputDto);
 
-        var actualDto = service.updateReview(DEFAULT_ID, BookFactory.DEFAULT_ID, inputDto);
+        var actualDto = service.updateReview(UserFactory.DEFAULT_ID, BookFactory.DEFAULT_ID, inputDto);
 
         assertEquals(expectedDto, actualDto);
     }
@@ -102,34 +103,35 @@ public class ReviewServiceTest {
         var updatedReviewDto = newDefaultReviewDto();
         updatedReviewDto.setRating(dto.getRating());
         updatedReviewDto.setComment(dto.getComment());
-        when(repository.findByIdAndBookId(DEFAULT_ID, BookFactory.DEFAULT_ID)).thenReturn(Optional.of(existingReview));
+        when(repository.findByUserIdAndBookId(UserFactory.DEFAULT_ID, BookFactory.DEFAULT_ID))
+                .thenReturn(Optional.of(existingReview));
         when(repository.save(any(Review.class))).thenReturn(existingReview);
         when(mapper.toDto(existingReview)).thenReturn(updatedReviewDto);
         return updatedReviewDto;
     }
 
     @Test
-    public void givenNonExistingReview_whenUpdateReview_thenThrowEntityNotFoundException() {
-        when(repository.findByIdAndBookId(DEFAULT_ID, BookFactory.DEFAULT_ID)).thenReturn(Optional.empty());
+    public void givenNonExistingReview_whenUpdateReview_thenThrowNotFoundException() {
+        when(repository.findByUserIdAndBookId(UserFactory.DEFAULT_ID, BookFactory.DEFAULT_ID)).thenReturn(Optional.empty());
 
         assertThrows(
-                EntityNotFoundException.class,
-                () -> service.updateReview(DEFAULT_ID, BookFactory.DEFAULT_ID, newDefaultReviewDtoWithoutId()));
+                NotFoundException.class,
+                () -> service.updateReview(UserFactory.DEFAULT_ID, BookFactory.DEFAULT_ID, newDefaultReviewDtoWithoutId()));
     }
 
     @Test
-    public void givenUserAlreadyLeftReview_whenLeaveReview_thenThrowIllegalArgumentException() {
+    public void givenUserAlreadyLeftReview_whenLeaveReview_thenThrowBadRequestException() {
         var inputDto = newDefaultReviewDtoWithoutId();
         when(repository.existsByUserIdAndBookId(UserFactory.DEFAULT_ID, BookFactory.DEFAULT_ID)).thenReturn(true);
 
         assertThrows(
-                IllegalArgumentException.class,
+                BadRequestException.class,
                 () -> service.leaveReview(UserFactory.DEFAULT_ID, BookFactory.DEFAULT_ID, inputDto));
     }
 
     @Test
-    public void givenExistingReview_whenRemoveReview_thenNoExceptionThrown() {
-        assertDoesNotThrow(() -> service.removeReview(DEFAULT_ID, BookFactory.DEFAULT_ID));
+    public void givenExistingReview_whenDeleteReview_thenNoExceptionThrown() {
+        assertDoesNotThrow(() -> service.deleteReview(UserFactory.DEFAULT_ID, BookFactory.DEFAULT_ID));
     }
 
 }

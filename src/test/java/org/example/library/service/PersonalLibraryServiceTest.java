@@ -1,10 +1,10 @@
 package org.example.library.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.example.library.domain.BookStatus;
 import org.example.library.domain.Library;
 import org.example.library.domain.LibraryBook;
 import org.example.library.dto.LibraryBookDto;
+import org.example.library.exception.NotFoundException;
 import org.example.library.factory.BookFactory;
 import org.example.library.mapper.LibraryBookMapper;
 import org.example.library.repository.LibraryBookRepository;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class LibraryServiceTest {
+public class PersonalLibraryServiceTest {
 
     @Mock
     private LibraryBookRepository repository;
@@ -36,7 +36,7 @@ public class LibraryServiceTest {
     @Mock
     private BookService bookService;
     @InjectMocks
-    private LibraryService service;
+    private PersonalLibraryService service;
 
     @Test
     public void givenUserId_whenGetAllLibraryBooks_thenReturnLibraryBookDtoList() {
@@ -76,31 +76,35 @@ public class LibraryServiceTest {
     }
 
     @Test
-    public void givenNonExistingLibrary_whenAddBookToLibrary_thenThrowEntityNotFoundException() {
+    public void givenNonExistingLibrary_whenAddBookToLibrary_thenThrowNotFoundException() {
         when(libraryRepository.findById(DEFAULT_LIBRARY_ID)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class,
-                () -> service.addBookToLibrary(DEFAULT_LIBRARY_ID, BookFactory.DEFAULT_ID));
+        assertThrows(
+                NotFoundException.class,
+                () -> service.addBookToLibrary(DEFAULT_LIBRARY_ID, BookFactory.DEFAULT_ID)
+        );
     }
 
     @Test
-    public void givenNonExistingBook_whenAddBookToLibrary_thenThrowEntityNotFoundException() {
-        when(bookService.getExistingBook(BookFactory.DEFAULT_ID)).thenThrow(EntityNotFoundException.class);
+    public void givenNonExistingBook_whenAddBookToLibrary_thenThrowNotFoundException() {
+        when(bookService.getExistingBook(BookFactory.DEFAULT_ID)).thenThrow(NotFoundException.class);
 
-        assertThrows(EntityNotFoundException.class,
-                () -> service.addBookToLibrary(DEFAULT_LIBRARY_ID, BookFactory.DEFAULT_ID));
+        assertThrows(
+                NotFoundException.class,
+                () -> service.addBookToLibrary(DEFAULT_LIBRARY_ID, BookFactory.DEFAULT_ID)
+        );
     }
 
     @Test
-    public void givenUserIdBookIdAndStatus_whenChangeStatus_thenReturnUpdatedLibraryBookDto() {
-        var expectedDto = setupMockedChangeStatus();
+    public void givenUserIdBookIdAndStatus_whenChangeBookStatus_thenReturnUpdatedLibraryBookDto() {
+        var expectedDto = setupMockedChangeBookStatus();
 
-        var actualDto = service.changeStatus(DEFAULT_LIBRARY_ID, BookFactory.DEFAULT_ID, BookStatus.READ);
+        var actualDto = service.changeBookStatus(DEFAULT_LIBRARY_ID, BookFactory.DEFAULT_ID, BookStatus.READ);
 
         assertEquals(expectedDto, actualDto);
     }
 
-    private LibraryBookDto setupMockedChangeStatus() {
+    private LibraryBookDto setupMockedChangeBookStatus() {
         var existingLibraryBook = newDefaultLibraryBook();
         var updatedLibraryBookDto = newDefaultLibraryBookDto();
         existingLibraryBook.setStatus(BookStatus.READ);
@@ -111,11 +115,13 @@ public class LibraryServiceTest {
     }
 
     @Test
-    public void givenNonExistingLibraryBook_whenChangeStatus_thenThrowEntityNotFoundException() {
+    public void givenNonExistingLibraryBook_whenChangeBookStatus_thenThrowNotFoundException() {
         when(repository.findById(DEFAULT_ID)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class,
-                () -> service.changeStatus(DEFAULT_LIBRARY_ID, BookFactory.DEFAULT_ID, BookStatus.READ));
+        assertThrows(
+                NotFoundException.class,
+                () -> service.changeBookStatus(DEFAULT_LIBRARY_ID, BookFactory.DEFAULT_ID, BookStatus.READ)
+        );
     }
 
     @Test

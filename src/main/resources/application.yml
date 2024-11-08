@@ -11,3 +11,7 @@ spring:
     show-sql: true
 server:
   port: 9091
+myjwttoken:
+  app:
+    jwtExpirationMs: 86400000
+    jwtSecret: ${JWT_SECRET_KEY}

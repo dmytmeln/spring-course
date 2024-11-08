@@ -1,10 +1,10 @@
 package org.example.library.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.example.library.domain.Book;
 import org.example.library.dto.BookRequest;
 import org.example.library.dto.BookResponse;
+import org.example.library.exception.NotFoundException;
 import org.example.library.mapper.BookMapper;
 import org.example.library.repository.BookRepository;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,7 @@ public class BookService {
 
     public Book getExistingBook(Integer id) {
         return repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Книгу не знайдено!"));
+                .orElseThrow(() -> new NotFoundException("Книгу не знайдено!"));
     }
 
     public BookResponse getExistingBookDto(Integer id) {
@@ -63,7 +63,7 @@ public class BookService {
 
     private void requireExistsById(Integer id) {
         if (!repository.existsById(id)) {
-            throw new IllegalArgumentException("Книгу не знайдено!");
+            throw new NotFoundException("Книгу не знайдено!");
         }
     }
 

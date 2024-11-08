@@ -16,7 +16,7 @@ public class AuthorDto {
     @NotBlank(message = "Ви повинні вказати ім'я!")
     private String fullName;
 
-    @NotBlank(message = "Ви повинні країну!")
+    @NotBlank(message = "Ви повинні вказати країну!")
     private String country;
 
     @NotNull(message = "Ви повинні вказати рік народження!")

@@ -12,10 +12,12 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
     Optional<Review> findByIdAndBookId(Integer id, Integer bookId);
 
+    Optional<Review> findByUserIdAndBookId(Integer userId, Integer bookId);
+
     List<Review> findAllByBookId(Integer bookId);
 
     boolean existsByUserIdAndBookId(Integer userId, Integer bookId);
 
-    void deleteByIdAndBookId(Integer id, Integer bookId);
+    void deleteByUserIdAndBookId(Integer userId, Integer bookId);
 
 }

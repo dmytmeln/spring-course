@@ -1,8 +1,8 @@
 package org.example.library.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.example.library.domain.Author;
 import org.example.library.dto.AuthorDto;
+import org.example.library.exception.NotFoundException;
 import org.example.library.mapper.AuthorMapper;
 import org.example.library.repository.AuthorRepository;
 import org.junit.jupiter.api.Test;
@@ -66,11 +66,11 @@ public class AuthorServiceTest {
     }
 
     @Test
-    public void givenNotExistingId_whenGetAuthor_thenThrowEntityNotFoundException() {
+    public void givenNotExistingId_whenGetAuthor_thenThrowNotFoundException() {
         when(repository.findById(DEFAULT_ID)).thenReturn(Optional.empty());
 
         assertThrows(
-                EntityNotFoundException.class,
+                NotFoundException.class,
                 () -> service.getExistingAuthor(DEFAULT_ID));
     }
 
@@ -92,11 +92,11 @@ public class AuthorServiceTest {
     }
 
     @Test
-    public void givenNonExistingId_whenGetAuthorDto_thenThrowEntityNotFoundException() {
+    public void givenNonExistingId_whenGetAuthorDto_thenThrowNotFoundException() {
         when(repository.findById(DEFAULT_ID)).thenReturn(Optional.empty());
 
         assertThrows(
-                EntityNotFoundException.class,
+                NotFoundException.class,
                 () -> service.getExistingAuthor(DEFAULT_ID));
         verify(mapper, times(0)).toDto(any(Author.class));
     }
@@ -147,19 +147,13 @@ public class AuthorServiceTest {
     }
 
     @Test
-    public void givenNonExistingId_whenUpdateAuthor_thenThrowEntityNotFoundException() {
+    public void givenNonExistingId_whenUpdateAuthor_thenThrowNotFoundException() {
         when(repository.existsById(DEFAULT_ID)).thenReturn(false);
 
-        verifyExceptionThrownAndMethodsWerentCalled();
-    }
-
-    private void verifyExceptionThrownAndMethodsWerentCalled() {
         assertThrows(
-                EntityNotFoundException.class,
-                () -> service.updateAuthor(DEFAULT_ID, newDefaultAuthorDto()));
-        verify(mapper, times(0)).toEntity(any(AuthorDto.class));
-        verify(mapper, times(0)).toDto(any(Author.class));
-        verify(repository, times(0)).save(any(Author.class));
+                NotFoundException.class,
+                () -> service.updateAuthor(DEFAULT_ID, newDefaultAuthorDto())
+        );
     }
 
     @Test

@@ -1,9 +1,9 @@
 package org.example.library.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.example.library.domain.Category;
 import org.example.library.dto.CategoryDto;
+import org.example.library.exception.NotFoundException;
 import org.example.library.mapper.CategoryMapper;
 import org.example.library.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class CategoryService {
 
     public Category getExistingCategory(Integer id) {
         return repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Категорію не знайдено!"));
+                .orElseThrow(() -> new NotFoundException("Категорію не знайдено!"));
     }
 
     public CategoryDto getExistingCategoryDto(Integer id) {
@@ -55,7 +55,6 @@ public class CategoryService {
             throw new IllegalArgumentException("Категорія з таким ім'ям вже існує!");
         }
     }
-
 
     public void deleteCategory(Integer id) {
         repository.deleteById(id);

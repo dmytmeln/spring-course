@@ -1,10 +1,11 @@
 package org.example.library.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.library.domain.Review;
 import org.example.library.dto.ReviewDto;
+import org.example.library.exception.BadRequestException;
+import org.example.library.exception.NotFoundException;
 import org.example.library.mapper.ReviewMapper;
 import org.example.library.repository.ReviewRepository;
 import org.springframework.stereotype.Service;
@@ -19,11 +20,6 @@ public class ReviewService {
     private final ReviewMapper mapper;
     private final UserService userService;
     private final BookService bookService;
-
-    private Review getExistingBookReview(Integer id, Integer bookId) {
-        return repository.findByIdAndBookId(id, bookId)
-                .orElseThrow(() -> new EntityNotFoundException("Відгук не знайдено!"));
-    }
 
     public List<ReviewDto> getBookReviews(Integer bookId) {
         return mapper.toDto(repository.findAllByBookId(bookId));
@@ -41,12 +37,12 @@ public class ReviewService {
 
     private void requireReviewNotExists(Integer userId, Integer bookId) {
         if (repository.existsByUserIdAndBookId(userId, bookId)) {
-            throw new IllegalArgumentException("Не можна двічі залишити відгук на книгу!");
+            throw new BadRequestException("Не можна двічі залишити відгук на книгу!");
         }
     }
 
-    public ReviewDto updateReview(Integer id, Integer bookId, ReviewDto dto) {
-        var existingReview = getExistingBookReview(id, bookId);
+    public ReviewDto updateReview(Integer userId, Integer bookId, ReviewDto dto) {
+        var existingReview = getExistingBookReview(userId, bookId);
         var updatedReview = repository.save(
                 existingReview.toBuilder()
                         .rating(dto.getRating())
@@ -56,8 +52,13 @@ public class ReviewService {
         return mapper.toDto(updatedReview);
     }
 
-    public void removeReview(Integer id, Integer bookId) {
-        repository.deleteByIdAndBookId(id, bookId);
+    private Review getExistingBookReview(Integer userId, Integer bookId) {
+        return repository.findByUserIdAndBookId(userId, bookId)
+                .orElseThrow(() -> new NotFoundException("Відгук не знайдено!"));
+    }
+
+    public void deleteReview(Integer userId, Integer bookId) {
+        repository.deleteByUserIdAndBookId(userId, bookId);
     }
 
 }
