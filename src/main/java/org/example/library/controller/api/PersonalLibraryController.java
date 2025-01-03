@@ -8,14 +8,15 @@ import org.example.library.service.PersonalLibraryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 
-import static org.springframework.http.ResponseEntity.*;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.ResponseEntity.noContent;
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
-@RequestMapping("api/library")
+@RequestMapping("/api/library")
 @RequiredArgsConstructor
 public class PersonalLibraryController {
 
@@ -27,15 +28,12 @@ public class PersonalLibraryController {
     }
 
     @PostMapping("/books/{bookId}")
-    public ResponseEntity<LibraryBookDto> addBookToLibrary(
+    @ResponseStatus(CREATED)
+    public LibraryBookDto addBookToLibrary(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Integer bookId
     ) {
-        var savedLibraryBookDto = service.addBookToLibrary(userDetails.getUserId(), bookId);
-        var uri = ServletUriComponentsBuilder.fromPath("/api/library/books")
-                .build()
-                .toUri();
-        return created(uri).body(savedLibraryBookDto);
+        return service.addBookToLibrary(userDetails.getUserId(), bookId);
     }
 
     @PutMapping("/books/{bookId}")

@@ -65,29 +65,29 @@
 
 # REST API Endpoints
 
-| **REST API Endpoint**                    | **Request Method** | **Description**                               | Query Parameters      |
-|------------------------------------------|--------------------|-----------------------------------------------|-----------------------|
-| `/api/books`                             | POST               | Add a new book                                |                       |
-| `/api/authors`                           | POST               | Add a new author                              |                       |
-| `/api/categories`                        | POST               | Add a new category                            |                       |
-| `/api/library/books`                     | POST               | Add a book to the user's personal library     |                       |
-| `/api/books/{bookId}/reviews`            | POST               | Leave a review on a book                      |                       |
-| `/api/books/{bookId}`                    | PUT                | Update an existing book details               |                       |
-| `/api/authors/{authorId}`                | PUT                | Update author information                     |                       |
-| `/api/categories/{categoryId}`           | PUT                | Update category details                       |                       |
-| `/api/library/books/{bookId}`            | PUT                | Change the status of a book                   | `status`              |
-| `/api/books/{bookId}`                    | DELETE             | Delete a book from the library                |                       |
-| `/api/authors/{authorId}`                | DELETE             | Delete an author                              |                       |
-| `/api/categories/{categoryId}`           | DELETE             | Delete a category                             |                       |
-| `/api/users/{userId}`                    | DELETE             | Delete a user                                 |                       |
-| `/api/books/{bookId}/reviews/{reviewId}` | DELETE             | Delete a review                               |                       |
-| `/api/library/books/{bookId}`            | DELETE             | Remove a book from the user's library         |                       |
-| `/api/books`                             | GET                | View a list of books                          | `categoryId`, `title` |
-| `/api/books/authors/{authorId}`          | GET                | View a list of author's books                 |                       |
-| `/api/authors`                           | GET                | View a list of all authors                    |                       |
-| `/api/categories`                        | GET                | View a list of all categories                 |                       |
-| `/api/library`                           | GET                | View personal library (list of books)         |                       |
-| `/api/library/authors`                   | GET                | View a list of authors in personal library    |                       |
-| `/api/library/categories`                | GET                | View a list of categories in personal library |                       |
-| `/api/books/{bookId}`                    | GET                | View details of a specific book               |                       |
-| `/api/books/{bookId}/reviews`            | GET                | See reviews for a specific book               | `bookId`              |
+| **REST API Endpoint**           | **Request Method** | **Description**                               | Query Parameters      |
+|---------------------------------|--------------------|-----------------------------------------------|-----------------------|
+| `/api/books`                    | POST               | Add a new book                                |                       |
+| `/api/authors`                  | POST               | Add a new author                              |                       |
+| `/api/categories`               | POST               | Add a new category                            |                       |
+| `/api/library/books`            | POST               | Add a book to the user's personal library     |                       |
+| `/api/reviews`                  | POST               | Leave a review on a book                      | `bookId`              |
+| `/api/books/{bookId}`           | PUT                | Update an existing book details               |                       |
+| `/api/authors/{authorId}`       | PUT                | Update author information                     |                       |
+| `/api/categories/{categoryId}`  | PUT                | Update category details                       |                       |
+| `/api/library/books/{bookId}`   | PUT                | Change the status of a book                   | `status`              |
+| `/api/books/{bookId}`           | DELETE             | Delete a book from the library                |                       |
+| `/api/authors/{authorId}`       | DELETE             | Delete an author                              |                       |
+| `/api/categories/{categoryId}`  | DELETE             | Delete a category                             |                       |
+| `/api/users/{userId}`           | DELETE             | Delete a user                                 |                       |
+| `/api/reviews`                  | DELETE             | Delete a review                               | `bookId`              |
+| `/api/library/books/{bookId}`   | DELETE             | Remove a book from the user's library         |                       |
+| `/api/books`                    | GET                | View a list of books                          | `categoryId`, `title` |
+| `/api/books/authors/{authorId}` | GET                | View a list of author's books                 |                       |
+| `/api/authors`                  | GET                | View a list of all authors                    |                       |
+| `/api/categories`               | GET                | View a list of all categories                 |                       |
+| `/api/library`                  | GET                | View personal library (list of books)         |                       |
+| `/api/library/authors`          | GET                | View a list of authors in personal library    |                       |
+| `/api/library/categories`       | GET                | View a list of categories in personal library |                       |
+| `/api/books/{bookId}`           | GET                | View details of a specific book               |                       |
+| `/api/reviews`                  | GET                | See reviews for a specific book               | `bookId`              |

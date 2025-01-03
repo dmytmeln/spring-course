@@ -38,12 +38,12 @@ public class CategoryService {
     }
 
     public CategoryDto updateCategory(Integer id, CategoryDto dto) {
-        requireNotExistsByName(id, dto.getName());
+        requireNotAlreadyExistsByName(id, dto.getName());
         var updatedCategory = repository.save(mapper.toEntity(dto, id));
         return mapper.toDto(updatedCategory);
     }
 
-    private void requireNotExistsByName(Integer id, String categoryName) {
+    private void requireNotAlreadyExistsByName(Integer id, String categoryName) {
         var existingCategory = getExistingCategory(id);
         if (!existingCategory.getName().equals(categoryName)) {
             requireNotExistsByName(categoryName);

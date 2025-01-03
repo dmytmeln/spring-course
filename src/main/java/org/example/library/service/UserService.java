@@ -1,6 +1,7 @@
 package org.example.library.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.library.domain.Library;
 import org.example.library.domain.User;
 import org.example.library.dto.user.CreateUser;
 import org.example.library.dto.user.UpdateUser;
@@ -38,10 +39,18 @@ public class UserService {
 
     public UserResponse createUser(CreateUser dto) {
         requireNotExistsByEmail(dto.getEmail());
+
         var user = mapper.toEntity(dto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        setLibraryToUser(user);
         var savedUser = repository.save(user);
         return mapper.toResponse(savedUser);
+    }
+
+    private static void setLibraryToUser(User user) {
+        var personalLibrary = new Library();
+        personalLibrary.setUser(user);
+        user.setLibrary(personalLibrary);
     }
 
     public UserResponse updateUser(Integer id, UpdateUser dto) {

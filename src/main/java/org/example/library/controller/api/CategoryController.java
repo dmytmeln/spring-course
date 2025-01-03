@@ -7,11 +7,12 @@ import org.example.library.service.CategoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 
-import static org.springframework.http.ResponseEntity.*;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.ResponseEntity.noContent;
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -27,12 +28,9 @@ public class CategoryController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CategoryDto> addCategory(@RequestBody @Valid CategoryDto requestBody) {
-        var createdCategoryResponse = service.createCategory(requestBody);
-        var uri = ServletUriComponentsBuilder.fromPath("/api/categories/{categoryId}")
-                .buildAndExpand(createdCategoryResponse.getId())
-                .toUri();
-        return created(uri).body(createdCategoryResponse);
+    @ResponseStatus(CREATED)
+    public CategoryDto addCategory(@RequestBody @Valid CategoryDto requestBody) {
+        return service.createCategory(requestBody);
     }
 
     @GetMapping("/{categoryId}")

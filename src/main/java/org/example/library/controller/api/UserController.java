@@ -15,7 +15,7 @@ import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
-@RequestMapping("api/me")
+@RequestMapping("/api/me")
 @RequiredArgsConstructor
 public class UserController {
 

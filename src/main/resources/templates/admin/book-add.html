@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <title>Add Book</title>
+    <style>
+        .list-group-item:hover {
+            cursor: pointer;
+            background-color: #0295f6;
+            color: white;
+        }
+
+        #authorSearch {
+            border-radius: 20px;
+        }
+
+        #selectedAuthors h6 {
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{header.html}"></div>
+<div class="container bg-light p-5 my-4 rounded shadow">
+    <h1 class="text-center text-primary">Add Book</h1>
+    <form th:action="@{/admin/books/add}" th:object="${bookRequest}" method="post" class="mt-4">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="bookTitle" class="form-label">Book Title:</label>
+                <input th:field="*{title}" id="bookTitle" type="text" class="form-control"
+                       placeholder="Enter book title" required>
+                <small class="text-danger" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small>
+            </div>
+            <div class="col-md-6">
+                <label for="bookPublishYear" class="form-label">Publication Year:</label>
+                <input th:field="*{publishYear}" id="bookPublishYear" type="text" class="form-control"
+                       placeholder="Enter publication year" required>
+                <small class="text-danger" th:if="${#fields.hasErrors('publishYear')}"
+                       th:errors="*{publishYear}"></small>
+            </div>
+        </div>
+
+        <div class="row g-3 mt-3">
+            <div class="col-md-6">
+                <label for="bookLanguage" class="form-label">Language:</label>
+                <input th:field="*{language}" id="bookLanguage" type="text" class="form-control"
+                       placeholder="Enter book language" required>
+                <small class="text-danger" th:if="${#fields.hasErrors('language')}" th:errors="*{language}"></small>
+            </div>
+            <div class="col-md-6">
+                <label for="bookPages" class="form-label">Pages:</label>
+                <input th:field="*{pages}" id="bookPages" type="text" class="form-control"
+                       placeholder="Enter book pages">
+                <small class="text-danger" th:if="${#fields.hasErrors('pages')}" th:errors="*{pages}"></small>
+            </div>
+        </div>
+
+        <div class="form-group mt-4">
+            <label for="bookCategory" class="form-label">Category:</label>
+            <select th:field="*{categoryId}" id="bookCategory" class="form-select" required>
+                <option th:value="null">Select a category</option>
+                <option th:each="category : ${categories}" th:text="${category.name}"
+                        th:value="${category.id}"></option>
+            </select>
+            <small class="text-danger" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}"></small>
+        </div>
+
+        <div class="form-group mt-4">
+            <label for="authorSearch" class="form-label">Search for Authors:</label>
+            <input type="text" id="authorSearch" class="form-control" placeholder="Full name...">
+            <ul id="authorsList" class="list-group mt-3">
+                <li th:each="author : ${authors}" th:text="${author.fullName}" th:data-value="${author.id}"
+                    class="list-group-item" onclick="selectAuthor(this)"></li>
+            </ul>
+            <div id="selectedAuthors" class="mt-4">
+                <h6>Selected Authors:</h6>
+                <ul id="selectedAuthorsList" class="list-group"></ul>
+            </div>
+            <input type="hidden" name="authorsId" th:field="*{authorsId}" id="hiddenAuthorsInput">
+            <small class="text-danger" th:if="${#fields.hasErrors('authorsId')}" th:errors="*{authorsId}"></small>
+        </div>
+
+        <div class="form-group mt-4">
+            <label for="bookDescription" class="form-label">Description:</label>
+            <textarea th:field="*{description}" id="bookDescription" class="form-control"
+                      placeholder="Enter book description" rows="5"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-4 w-100">Submit</button>
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+    </form>
+    <a class="btn btn-secondary mt-4 w-100" th:href="@{/admin/books}">Return to All Books</a>
+</div>
+
+<script>
+    document.getElementById('authorSearch').addEventListener('input', function () {
+        const filter = this.value.toLowerCase();
+        const authors = document.querySelectorAll('#authorsList li');
+        authors.forEach(author => {
+            const text = author.textContent.toLowerCase();
+            author.style.display = text.includes(filter) ? '' : 'none';
+        });
+    });
+
+    function selectAuthor(authorElement) {
+        const authorId = authorElement.getAttribute('data-value');
+        const authorName = authorElement.textContent;
+
+        if (!document.querySelector(`#selectedAuthorsList li[data-value='${authorId}']`)) {
+            const selectedAuthorsList = document.getElementById('selectedAuthorsList');
+            const selectedAuthorItem = document.createElement('li');
+            selectedAuthorItem.className = 'list-group-item';
+            selectedAuthorItem.textContent = authorName;
+            selectedAuthorItem.setAttribute('data-value', authorId);
+            selectedAuthorItem.onclick = function () {
+                removeSelectedAuthor(this, authorId);
+            };
+            selectedAuthorsList.appendChild(selectedAuthorItem);
+
+            updateHiddenAuthorsInput();
+            authorElement.style.display = 'none';
+        }
+    }
+
+    function removeSelectedAuthor(authorElement, authorId) {
+        authorElement.remove();
+        document.querySelector(`#authorsList li[data-value='${authorId}']`).style.display = '';
+        updateHiddenAuthorsInput();
+    }
+
+    function updateHiddenAuthorsInput() {
+        const selectedAuthorsList = document.getElementById('selectedAuthorsList');
+        const selectedIds = Array.from(selectedAuthorsList.children).map(author => author.getAttribute('data-value'));
+        document.getElementById('hiddenAuthorsInput').value = selectedIds.join(',');
+    }
+</script>
+</body>
+</html>
