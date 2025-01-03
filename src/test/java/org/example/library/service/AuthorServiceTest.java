@@ -34,7 +34,7 @@ public class AuthorServiceTest {
 
         var actualDtos = service.getAllAuthors("");
 
-        assertIterableEquals(expectedDtos, actualDtos);
+        assertIterableEquals(expectedDtos, actualDtos); // todo: add verify
     }
 
     private List<AuthorDto> setupMockedAuthorListInDb() {

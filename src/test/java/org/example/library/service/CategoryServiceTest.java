@@ -158,6 +158,28 @@ public class CategoryServiceTest {
     }
 
     @Test
+    public void givenExistingIdAndDtoWithTheSameNameAsInDb_whenUpdateCategory_thenReturnUpdatedCategoryDto() {
+        var inputDto = newDefaultCategoryDtoWithoutId();
+        var expectedDto = setupMockedUpdateFlow_withoutNameChanges(inputDto);
+
+        var actualDto = service.updateCategory(DEFAULT_ID, inputDto);
+
+        assertEquals(expectedDto, actualDto);
+        assertEquals(DEFAULT_ID, actualDto.getId());
+    }
+
+    private CategoryDto setupMockedUpdateFlow_withoutNameChanges(CategoryDto dto) {
+        var categoryDb = newDefaultCategory();
+        var updatedCategory = newDefaultCategory();
+        var updatedCategoryDto = newDefaultCategoryDto();
+        when(repository.findById(DEFAULT_ID)).thenReturn(Optional.of(categoryDb));
+        when(mapper.toEntity(dto, DEFAULT_ID)).thenReturn(categoryDb);
+        when(repository.save(categoryDb)).thenReturn(updatedCategory);
+        when(mapper.toDto(updatedCategory)).thenReturn(updatedCategoryDto);
+        return updatedCategoryDto;
+    }
+
+    @Test
     public void givenExistingIdAndDtoWithAlreadyExistingName_whenUpdateCategory_thenThrowIllegalArgumentException() {
         var inputDto = newDefaultCategoryDtoWithoutId();
         setupMockedUpdateFlowToThrowIllegalArgumentException(inputDto);

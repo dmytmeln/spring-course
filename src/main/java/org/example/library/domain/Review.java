@@ -2,10 +2,9 @@ package org.example.library.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
-
-import static java.time.LocalDate.now;
 
 @Getter
 @Setter
@@ -25,6 +24,7 @@ public class Review {
     private Byte rating;
 
     @Column(name = "created_at", nullable = false, columnDefinition = "DATE")
+    @CreationTimestamp
     private LocalDate createdAt;
 
     @Column(name = "comment")
@@ -37,10 +37,5 @@ public class Review {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
-
-    @PrePersist
-    private void onCreate() {
-        createdAt = now();
-    }
 
 }

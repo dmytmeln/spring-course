@@ -3,6 +3,8 @@ package org.example.library.util;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import org.example.library.domain.Role;
+import org.example.library.domain.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -19,12 +21,14 @@ public class JwtUtil {
     @Value("${myjwttoken.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
-    public String generateTokenFromUsername(String username) {
+    public String generateToken(User user) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(user.getEmail())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(getSecretKey())
+                .claim("id", user.getId())
+                .claim("role", user.getRole())
                 .compact();
     }
 
@@ -55,8 +59,13 @@ public class JwtUtil {
         return false;
     }
 
-    public String getSubject(String token) {
-        return parseClaims(token).getSubject();
+    public User getUserByToken(String token) {
+        var claims = parseClaims(token);
+        return User.builder()
+                .id(claims.get("id", Integer.class))
+                .email(claims.getSubject())
+                .role(Role.valueOf(claims.get("role", String.class)))
+                .build();
     }
 
     private Claims parseClaims(String token) {

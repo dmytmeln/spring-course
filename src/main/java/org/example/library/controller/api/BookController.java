@@ -8,11 +8,12 @@ import org.example.library.service.BookService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 
-import static org.springframework.http.ResponseEntity.*;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.ResponseEntity.noContent;
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping("/api/books")
@@ -31,12 +32,9 @@ public class BookController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<BookResponse> addBook(@RequestBody @Valid BookRequest requestBody) {
-        var createdBookResponse = service.createBook(requestBody);
-        var uri = ServletUriComponentsBuilder.fromPath("/api/books/{bookId}")
-                .buildAndExpand(createdBookResponse.getId())
-                .toUri();
-        return created(uri).body(createdBookResponse);
+    @ResponseStatus(CREATED)
+    public BookResponse addBook(@RequestBody @Valid BookRequest requestBody) {
+        return service.createBook(requestBody);
     }
 
     @GetMapping("/authors/{authorId}")

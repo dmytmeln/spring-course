@@ -207,6 +207,7 @@ public class UserServiceTest {
         var updatedResponse = newDefaultUserResponse();
         when(repository.findById(DEFAULT_ID)).thenReturn(Optional.of(existingUser));
         when(passwordEncoder.matches(DEFAULT_PASSWORD, existingUser.getPassword())).thenReturn(true);
+        when(passwordEncoder.encode(DEFAULT_NEW_PASSWORD)).thenReturn(DEFAULT_NEW_PASSWORD);
         when(repository.save(existingUser)).thenReturn(existingUser);
         when(mapper.toResponse(existingUser)).thenReturn(updatedResponse);
         return updatedResponse;

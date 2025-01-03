@@ -14,11 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
@@ -31,8 +29,9 @@ public class AuthController {
     private final JwtUtil jwtUtils;
 
     @PostMapping("/signin")
-    public ResponseEntity<UserResponse> signin(@RequestBody @Valid CreateUser requestBody) {
-        return ok(service.createUser(requestBody));
+    @ResponseStatus(CREATED)
+    public UserResponse signin(@RequestBody @Valid CreateUser requestBody) {
+        return service.createUser(requestBody);
     }
 
     @PostMapping("/login")
@@ -42,7 +41,7 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(loginRequest.email(), loginRequest.password())
             );
             var user = ((UserDetailsImpl)authentication.getPrincipal()).getUser();
-            var jwtToken = jwtUtils.generateTokenFromUsername(user.getEmail());
+            var jwtToken = jwtUtils.generateToken(user);
             var authResponse = new LoginResponse(user.getEmail(), jwtToken);
             return ok().body(authResponse);
         } catch (BadCredentialsException e) {

@@ -3,6 +3,8 @@ package org.example.library.config;
 import lombok.RequiredArgsConstructor;
 import org.example.library.security.AuthEntryPointJwt;
 import org.example.library.security.AuthTokenFilter;
+import org.example.library.security.JwtTokenProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -13,11 +15,14 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+
+import java.util.List;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -27,12 +32,16 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final AuthEntryPointJwt authEntryPointJwt;
-    private final AuthTokenFilter authTokenFilter;
+    @Value("${spring.security.rememberMe.key}")
+    private String rememberMeKey;
 
     @Bean
     @Order(1)
-    public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain apiSecurityFilterChain(
+            HttpSecurity http,
+            AuthEntryPointJwt authEntryPointJwt,
+            AuthTokenFilter authTokenFilter
+    ) throws Exception {
         return http
                 .securityMatcher("/api/**")
                 .authorizeHttpRequests(
@@ -55,8 +64,11 @@ public class SecurityConfig {
                                 eh.authenticationEntryPoint(authEntryPointJwt)
                 )
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(AbstractHttpConfigurer::disable)
-                .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement(
+                        sm ->
+                                sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .addFilterBefore(authTokenFilter, BasicAuthenticationFilter.class)
                 .build();
     }
 
@@ -64,6 +76,7 @@ public class SecurityConfig {
     @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+                .csrf(withDefaults())
                 .authorizeHttpRequests(
                         authz ->
                                 authz
@@ -93,6 +106,10 @@ public class SecurityConfig {
                                         .deleteCookies("JSESSIONID")
                                         .permitAll()
                 )
+                .rememberMe(
+                        rememberMe ->
+                                rememberMe.key(rememberMeKey)
+                )
                 .build();
     }
 
@@ -102,14 +119,22 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(
+    public DaoAuthenticationProvider daoAuthenticationProvider(
             UserDetailsService userDetailsService,
             PasswordEncoder passwordEncoder
     ) {
-        var authProvider = new DaoAuthenticationProvider();
-        authProvider.setPasswordEncoder(passwordEncoder);
-        authProvider.setUserDetailsService(userDetailsService);
-        return new ProviderManager(authProvider);
+        var daoAuthenticationProvider = new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setUserDetailsService(userDetailsService);
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
+        return daoAuthenticationProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(
+            DaoAuthenticationProvider daoAuthenticationProvider,
+            JwtTokenProvider jwtTokenProvider
+    ) {
+        return new ProviderManager(List.of(jwtTokenProvider, daoAuthenticationProvider));
     }
 
 }

@@ -7,11 +7,12 @@ import org.example.library.service.AuthorService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 
-import static org.springframework.http.ResponseEntity.*;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.ResponseEntity.noContent;
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping("/api/authors")
@@ -29,12 +30,9 @@ public class AuthorController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<AuthorDto> addAuthor(@RequestBody @Valid AuthorDto requestBody) {
-        var createdAuthorResponse = service.createAuthor(requestBody);
-        var uri = ServletUriComponentsBuilder.fromPath("/api/authors/{authorId}")
-                .buildAndExpand(createdAuthorResponse.getId())
-                .toUri();
-        return created(uri).body(createdAuthorResponse);
+    @ResponseStatus(CREATED)
+    public AuthorDto addAuthor(@RequestBody @Valid AuthorDto requestBody) {
+        return service.createAuthor(requestBody);
     }
 
     @GetMapping("/{authorId}")
